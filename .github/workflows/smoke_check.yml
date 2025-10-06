@@ -1,0 +1,29 @@
+name: ปกป้องร่างแยก
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ตรวจ repo แปปนึงดิวะ
+        uses: actions/checkout@v4
+
+      - name: ลง python อยู่ใจเย็นดิ๊
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: เช็ค python syntax รอก่อนนะแว่น
+        run: |
+          echo "ปกป้องร่างแยก is Checking Python syntax... ใจเย็นๆพี่บ่าว"
+          python -m py_compile $(git ls-files '*.py')
+
+      - name: ส่งให้สรัลเทส main_program.py
+        run: |
+          echo "Saran is Testing main_program.py"
+          python main_program.py
