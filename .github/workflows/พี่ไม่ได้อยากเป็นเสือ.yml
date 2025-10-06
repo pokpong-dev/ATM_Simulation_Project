@@ -143,28 +143,15 @@ jobs:
         with:
           header: "ผลตรวจจากปกป้องร่างแยก"
           message: |
-            $(if [ "${{ steps.report.outputs.overall }}" = "passed" ]; then
-              echo "ผ่านว่ะ โครตเจ๋ง รอบนี้แว่นไม่บ่น ขอรหัส 4 ตัวท้ายด้วยจะหักคะแนนความดีแทน"
-            else
-              echo "ยังไม่รอด แว่นอ่านแล้วปวดหัว ไปดู import modules ด้วย error ยุ ไปนู่นไปรำคาญ"
-            fi)
-
+            ${{ steps.report.outputs.overall == 'passed'
+                && 'ผ่านว่ะ ขอรหัส 4 ตัวท้ายครับ'
+                || 'ไม่ผ่านว่ะ ไปนู่นไป อย่าทักมาอีกนะ รำคาญ' }}
+      
             ------------------------------------------------------------
-            รายงานฉบับเต็ม (อย่าขี้เกียจอ่าน)
+            รายงานฉบับเต็ม (อ่านนนนนน)
             ------------------------------------------------------------
-            $(cat report.md)
+            ${{ steps.report.outputs.report }}
 
-      - name: เก็บไฟล์ output
-        uses: actions/upload-artifact@v4
-        with:
-          name: smoke-outputs
-          path: |
-            syntax_stdout.txt
-            syntax_stderr.txt
-            program_stdout.txt
-            program_stderr.txt
-            import_result.txt
-            report.md
 
       - name: ตัดสินใจผ่านไม่ผ่าน
         if: ${{ steps.report.outputs.overall == 'failed' }}
