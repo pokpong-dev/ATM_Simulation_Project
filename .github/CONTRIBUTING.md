@@ -69,6 +69,13 @@ push ตรงเข้า main	main ถูกป้องกันไว้
 ถ้าเทสไม่ผ่าน → PR จะขึ้น “❌ Checks failed” → Merge ไม่ได้
 ถ้าเทสผ่านทั้งหมด → “✅ All checks passed” → Reviewer สามารถ merge ได้
 
+
+อย่าลืม
+ทำ commit ย่อย ๆ ดีกว่า commit ใหญ่ก้อนเดียว
+อ่านคอมเมนต์ใน PR ทุกครั้งก่อน merge
+ใช้ PR Template ที่เราให้เพื่ออธิบายงานชัดเจน
+ถ้าไม่แน่ใจให้ tag เราได้เลย @pokpong-dev ไว้ในคอมเมนต์
+
 ถ้าเจอข้อความ
 “You can’t commit to main because it is a protected branch”
 แปลว่า main ถูกป้องกันไม่ให้ commit ตรง เราตั้งใจเซ็ตไว้ เพราะว่าให้ทุกคนไปทำ feature/... แยกเป็นของตัวเอง
