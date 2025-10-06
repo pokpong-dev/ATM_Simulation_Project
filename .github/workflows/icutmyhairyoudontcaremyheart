@@ -1,0 +1,49 @@
+name: ประกาศสายตามเสียง
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, closed]
+
+jobs:
+  ping_discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: เตรียมข้อความไปด่… เอ๊ย ไปแจ้ง
+        id: prep
+        run: |
+          EVENT="${{ github.event_name }}"
+          if [ "$EVENT" = "push" ]; then
+            MSG="มีการ push ใส่ branch ${GITHUB_REF#refs/heads/} โดย ${{ github.actor }}
+Commit: ${{ github.sha }}
+ข้อความ: ${{ github.event.head_commit.message }}
+ดู diff: ${{ github.event.compare }}"
+          else
+            ACTION="${{ github.event.action }}"
+            PR_NUM="${{ github.event.pull_request.number }}"
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            PR_URL="${{ github.event.pull_request.html_url }}"
+            MERGED="${{ github.event.pull_request.merged }}"
+            if [ "$ACTION" = "closed" ] && [ "$MERGED" = "true" ]; then
+              STATE="PR #$PR_NUM โดนรวบแล้ว"
+            else
+              STATE="PR #$PR_NUM ($ACTION)"
+            fi
+            MSG="$STATE
+หัวข้อ: $PR_TITLE
+ลิงก์: $PR_URL
+คนก่อเรื่อง: ${{ github.actor }}"
+          fi
+
+          MSG_ESCAPED=$(printf '%s' "$MSG" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+
+          echo "body={\"content\": $MSG_ESCAPED}" >> "$GITHUB_OUTPUT"
+
+      - name: ส่งเข้า Discord
+        env:
+          pok: ${{ secrets.pok }}
+        run: |
+          curl -sS -X POST "$pok" \
+            -H "Content-Type: application/json" \
+            -d '${{ steps.prep.outputs.body }}'
