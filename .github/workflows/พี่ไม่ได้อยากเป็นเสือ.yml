@@ -79,10 +79,10 @@ jobs:
           fi
 
           if [ ${rc} -eq 0 ]; then
-            echo "status=passed" >> "$GITHUB_OUTPUT"
+            echo "status=ผ่าน" >> "$GITHUB_OUTPUT"
             echo "exit_code=0"    >> "$GITHUB_OUTPUT"
           else
-            echo "status=failed" >> "$GITHUB_OUTPUT"
+            echo "status=ไม่ผ่าน" >> "$GITHUB_OUTPUT"
             echo "exit_code=${rc}" >> "$GITHUB_OUTPUT"
           fi
 
@@ -157,7 +157,7 @@ jobs:
       - name: เก็บไฟล์ output
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-outputs
+          name: ใบลาออก
           path: |
             syntax_stdout.txt
             syntax_stderr.txt
