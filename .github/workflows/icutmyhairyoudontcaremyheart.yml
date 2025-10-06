@@ -13,37 +13,54 @@ jobs:
       - name: เตรียมข้อความไปด่… เอ๊ย ไปแจ้ง
         id: prep
         run: |
-          EVENT="${{ github.event_name }}"
-          if [ "$EVENT" = "push" ]; then
-            MSG="มีการ push ใส่ branch ${GITHUB_REF#refs/heads/} โดย ${{ github.actor }}
-Commit: ${{ github.sha }}
-ข้อความ: ${{ github.event.head_commit.message }}
-ดู diff: ${{ github.event.compare }}"
+          set -e # ให้สคริปต์หยุดทันทีถ้ามี error
+
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # กรณี push
+            COMMIT_MSG=$(echo "${{ github.event.head_commit.message }}" | tr '\n' ' ')
+            MSG="มีการ push ใส่ branch **${{ github.ref_name }}** โดย **${{ github.actor }}**
+            **ข้อความ:** ${COMMIT_MSG:-"(ไม่มีข้อความคอมมิต)"}
+            **ดูการเปลี่ยนแปลง:** ${{ github.event.compare }}"
+
           else
-            ACTION="${{ github.event.action }}"
+            # กรณี pull request
+            PR_ACTION="${{ github.event.action }}"
+            PR_MERGED="${{ github.event.pull_request.merged }}"
             PR_NUM="${{ github.event.pull_request.number }}"
-            PR_TITLE="${{ github.event.pull_request.title }}"
-            PR_URL="${{ github.event.pull_request.html_url }}"
-            MERGED="${{ github.event.pull_request.merged }}"
-            if [ "$ACTION" = "closed" ] && [ "$MERGED" = "true" ]; then
-              STATE="PR #$PR_NUM โดนรวบแล้ว"
-            else
-              STATE="PR #$PR_NUM ($ACTION)"
+            PR_TITLE=$(echo "${{ github.event.pull_request.title }}" | tr '\n' ' ')
+            
+            STATE="PR #${PR_NUM} (${PR_ACTION})"
+            if [[ "$PR_ACTION" == "closed" && "$PR_MERGED" == "true" ]]; then
+              STATE="✅ PR #${PR_NUM} ถูกรวม (merged) แล้ว"
+            elif [[ "$PR_ACTION" == "closed" ]]; then
+              STATE="❌ PR #${PR_NUM} ถูกปิด (closed) โดยไม่รวม"
             fi
-            MSG="$STATE
-หัวข้อ: $PR_TITLE
-ลิงก์: $PR_URL
-คนก่อเรื่อง: ${{ github.actor }}"
+
+            MSG="${STATE}
+            **หัวข้อ:** ${PR_TITLE}
+            **ลิงก์:** ${{ github.event.pull_request.html_url }}
+            **คนก่อเรื่อง:** **${{ github.actor }}**"
           fi
 
-          MSG_ESCAPED=$(printf '%s' "$MSG" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
-
-          echo "body={\"content\": $MSG_ESCAPED}" >> "$GITHUB_OUTPUT"
+          # ส่งตัวแปร MSG เข้า GITHUB_ENV เพื่อให้ python เรียกใช้ได้
+          echo "DISCORD_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$MSG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+      - name: สร้าง JSON Payload
+        id: json_payload
+        run: |
+          python -c '
+          import json, os
+          msg = os.environ.get("DISCORD_MESSAGE", "")
+          payload = json.dumps({"content": msg}, ensure_ascii=False)
+          print(f"body={payload}")
+          ' >> "$GITHUB_OUTPUT"
 
       - name: ส่งเข้า Discord
         env:
-          pok: ${{ secrets.pok }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.pok }}
         run: |
-          curl -sS -X POST "$pok" \
+          curl -sS -X POST "$DISCORD_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
-            -d '${{ steps.prep.outputs.body }}'
+            -d '${{ steps.json_payload.outputs.body }}'
