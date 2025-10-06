@@ -1,12 +1,17 @@
-name: ปกป้องร่างแยก
+name: ปกป้องร่างแยกให้
 
 on:
   push:
     branches: [ main ]
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   smoke:
+    name: ปกป้องร่างแยกกำลังอ่านโค้ดของคุณ
     runs-on: ubuntu-latest
 
     steps:
@@ -19,11 +24,123 @@ jobs:
           python-version: '3.13'
 
       - name: เช็ค python syntax รอก่อนนะแว่น
+        id: syntax
+        shell: bash
         run: |
-          echo "ปกป้องร่างแยก is Checking Python syntax... ใจเย็นๆพี่บ่าว"
-          python -m py_compile $(git ls-files '*.py')
+          set +e
+          echo "ปกป้องร่างแยกกำลังตรวจ syntax ของพวกแก รอสักครู่ เดี๋ยวแว่นยังอ่านอยู่"
+          FILES="$(git ls-files '*.py')"
+          if [ -z "$FILES" ]; then
+            echo "ไม่มีไฟล์ .py เลย เอายังไงดีวะเนี่ย" | tee syntax_stdout.txt
+            : > syntax_stderr.txt
+            echo "status=passed" >> "$GITHUB_OUTPUT"
+          else
+            python -m py_compile $FILES 1>syntax_stdout.txt 2>syntax_stderr.txt
+            rc=$?
+            if [ $rc -eq 0 ]; then
+              echo "status=passed" >> "$GITHUB_OUTPUT"
+            else
+              echo "status=failed" >> "$GITHUB_OUTPUT"
+            fi
+          fi
 
       - name: ส่งให้สรัลเทส main_program.py
+        id: runprog
+        shell: bash
         run: |
-          echo "Saran is Testing main_program.py"
-          python main_program.py
+          set +e
+          echo "สรัลกำลังรัน main_program.py... ขอให้รอด"
+          if [ -f main_program.py ]; then
+            python main_program.py 1>program_stdout.txt 2>program_stderr.txt
+            rc=$?
+          else
+            echo "หา main_program.py ไม่เจอเลยพวก เอาไปไว้ไหนเนี่ย" | tee program_stderr.txt
+            : > program_stdout.txt
+            rc=127
+          fi
+
+          if [ ${rc} -eq 0 ]; then
+            echo "status=passed" >> "$GITHUB_OUTPUT"
+            echo "exit_code=0"    >> "$GITHUB_OUTPUT"
+          else
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+            echo "exit_code=${rc}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: สรุปผลเป็น Markdown
+        id: report
+        shell: bash
+        run: |
+          SYNTAX_STATUS="${{ steps.syntax.outputs.status }}"
+          RUN_STATUS="${{ steps.runprog.outputs.status }}"
+          EXIT_CODE="${{ steps.runprog.outputs.exit_code }}"
+
+          OVERALL="passed"
+          if [ "$SYNTAX_STATUS" != "passed" ] || [ "$RUN_STATUS" != "passed" ]; then
+            OVERALL="failed"
+          fi
+
+          {
+            echo "# รายงานจากปกป้องร่างแยก (TA โหมด)"
+            echo
+            echo "- Syntax Check: ${SYNTAX_STATUS}"
+            echo "- Run main_program.py: ${RUN_STATUS} (exit code: ${EXIT_CODE:-N/A})"
+            echo "- Overall: ${OVERALL}"
+            echo
+            echo "## Syntax stdout"
+            echo '```'
+            cat syntax_stdout.txt || true
+            echo '```'
+            echo
+            echo "## Syntax stderr"
+            echo '```'
+            cat syntax_stderr.txt || true
+            echo '```'
+            echo
+            echo "## Program stdout (main_program.py)"
+            echo '```'
+            cat program_stdout.txt || true
+            echo '```'
+            echo
+            echo "## Program stderr (main_program.py)"
+            echo '```'
+            cat program_stderr.txt || true
+            echo '```'
+          } > report.md
+
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+          echo "overall=${OVERALL}" >> "$GITHUB_OUTPUT"
+
+      - name: คอมเมนต์ผลใน PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: "ผลตรวจจากปกป้องร่างแยก"
+          message: |
+            $(if [ "${{ steps.report.outputs.overall }}" = "passed" ]; then
+              echo "ผ่านว่ะ โครตเจ๋ง รอบนี้แว่นไม่บ่น ขอรหัส 4 ตัวท้ายด้วยจะหักคะแนนความดีแทน"
+            else
+              echo "ยังไม่รอด แว่นอ่านแล้วปวดหัว ตรวจ syntax ใหม่ดิ มัน error ยุ"
+            fi)
+
+            ------------------------------------------------------------
+            รายงานฉบับเต็ม (อย่าขี้เกียจอ่าน)
+            ------------------------------------------------------------
+            $(cat report.md)
+
+      - name: เก็บไฟล์ output เป็น Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-outputs
+          path: |
+            syntax_stdout.txt
+            syntax_stderr.txt
+            program_stdout.txt
+            program_stderr.txt
+            report.md
+
+      - name: ตัดสินใจผ่านไม่ผ่าน
+        if: ${{ steps.report.outputs.overall == 'failed' }}
+        run: |
+          echo "แว่นบอกไม่ผ่าน ยังไม่รอด ขอรหัส 4 ตัวท้ายด้วยครับ"
+          exit 1
