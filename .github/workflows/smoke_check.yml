@@ -44,6 +44,25 @@ jobs:
             fi
           fi
 
+      - name: ตรวจว่า import ครบไหมวะเนี่ย
+        id: importcheck
+        shell: bash
+        run: |
+          set +e
+          echo "แว่นกำลังดูว่าพวกแก import ถูกไหม เดี๋ยวดูหน่อยสิ..."
+          if [ ! -f main_program.py ]; then
+            echo "main_program.py หายอีกละ เอาไปซ่อนไหน" | tee import_result.txt
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+          else
+            if grep -q "^from modules import file_handler, auth, account" main_program.py; then
+              echo "โอเคนะ เห็น import ครบอยู่ แว่นไม่บ่น" | tee import_result.txt
+              echo "status=passed" >> "$GITHUB_OUTPUT"
+            else
+              echo "ไหนวะ import modules... file_handler, auth, account มันอยู่ไหน หาไม่เจอเลย" | tee import_result.txt
+              echo "status=failed" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
       - name: ส่งให้สรัลเทส main_program.py
         id: runprog
         shell: bash
@@ -72,20 +91,27 @@ jobs:
         shell: bash
         run: |
           SYNTAX_STATUS="${{ steps.syntax.outputs.status }}"
+          IMPORT_STATUS="${{ steps.importcheck.outputs.status }}"
           RUN_STATUS="${{ steps.runprog.outputs.status }}"
           EXIT_CODE="${{ steps.runprog.outputs.exit_code }}"
 
           OVERALL="passed"
-          if [ "$SYNTAX_STATUS" != "passed" ] || [ "$RUN_STATUS" != "passed" ]; then
+          if [ "$SYNTAX_STATUS" != "passed" ] || [ "$IMPORT_STATUS" != "passed" ] || [ "$RUN_STATUS" != "passed" ]; then
             OVERALL="failed"
           fi
 
           {
-            echo "# รายงานจากปกป้องร่างแยก (TA โหมด)"
+            echo "# รายงานจากปกป้องร่างแยก (แว่นฉุนโหมด)"
             echo
             echo "- Syntax Check: ${SYNTAX_STATUS}"
+            echo "- Import Check: ${IMPORT_STATUS}"
             echo "- Run main_program.py: ${RUN_STATUS} (exit code: ${EXIT_CODE:-N/A})"
             echo "- Overall: ${OVERALL}"
+            echo
+            echo "## ผลการตรวจ import"
+            echo '```'
+            cat import_result.txt || true
+            echo '```'
             echo
             echo "## Syntax stdout"
             echo '```'
@@ -120,7 +146,7 @@ jobs:
             $(if [ "${{ steps.report.outputs.overall }}" = "passed" ]; then
               echo "ผ่านว่ะ โครตเจ๋ง รอบนี้แว่นไม่บ่น ขอรหัส 4 ตัวท้ายด้วยจะหักคะแนนความดีแทน"
             else
-              echo "ยังไม่รอด แว่นอ่านแล้วปวดหัว ตรวจ syntax ใหม่ดิ มัน error ยุ"
+              echo "ยังไม่รอด แว่นอ่านแล้วปวดหัว ไปดู import modules ด้วย error ยุ ไปนู่นไปรำคาญ"
             fi)
 
             ------------------------------------------------------------
@@ -128,7 +154,7 @@ jobs:
             ------------------------------------------------------------
             $(cat report.md)
 
-      - name: เก็บไฟล์ output เป็น Artifact
+      - name: เก็บไฟล์ output
         uses: actions/upload-artifact@v4
         with:
           name: smoke-outputs
@@ -137,10 +163,11 @@ jobs:
             syntax_stderr.txt
             program_stdout.txt
             program_stderr.txt
+            import_result.txt
             report.md
 
       - name: ตัดสินใจผ่านไม่ผ่าน
         if: ${{ steps.report.outputs.overall == 'failed' }}
         run: |
-          echo "แว่นบอกไม่ผ่าน ยังไม่รอด ขอรหัส 4 ตัวท้ายด้วยครับ"
+          echo "แว่นบอกไม่ผ่าน ยังไม่รอด อย่าลืม import ให้ครบด้วยนะ รำคาญ"
           exit 1
