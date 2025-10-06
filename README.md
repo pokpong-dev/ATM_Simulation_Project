@@ -1,3 +1,6 @@
+## Project Current Status ##
+[![ปกป้องร่างแยกให้](https://github.com/pokpong-dev/ATM_Simulation_Project/actions/workflows/%E0%B8%9E%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%AD%E0%B8%A2%E0%B8%B2%E0%B8%81%E0%B9%80%E0%B8%9B%E0%B9%87%E0%B8%99%E0%B9%80%E0%B8%AA%E0%B8%B7%E0%B8%AD.yml/badge.svg)](https://github.com/pokpong-dev/ATM_Simulation_Project/actions/workflows/%E0%B8%9E%E0%B8%B5%E0%B9%88%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%84%E0%B8%94%E0%B9%89%E0%B8%AD%E0%B8%A2%E0%B8%B2%E0%B8%81%E0%B9%80%E0%B8%9B%E0%B9%87%E0%B8%99%E0%B9%80%E0%B8%AA%E0%B8%B7%E0%B8%AD.yml)
+
 # ATM Simulation Program (Command Line Interface)
 
 โครงงานรายวิชา SC361002 การเขียนโปรแกรมเชิงโครงสร้างสำหรับเทคโนโลยีสารสนเทศ  
