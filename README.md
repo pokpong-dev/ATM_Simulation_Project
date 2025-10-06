@@ -1,3 +1,6 @@
+## Project Current Status ##
+[![ปกป้องร่างแยก](https://github.com/pokpong-dev/ATM_Simulation_Project/actions/workflows/smoke_check.yml/badge.svg)](https://github.com/pokpong-dev/ATM_Simulation_Project/actions/workflows/smoke_check.yml)
+
 # ATM Simulation Program (Command Line Interface)
 
 โครงงานรายวิชา SC361002 การเขียนโปรแกรมเชิงโครงสร้างสำหรับเทคโนโลยีสารสนเทศ  
