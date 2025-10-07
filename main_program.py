@@ -1,7 +1,8 @@
 from modules import file_handler, auth, account
 
 def main():
-    print("SARAN O.K")
+    print("pok")
+    print("s"a)
     print("yim")
 
 if __name__ == "__main__":
