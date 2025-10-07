@@ -4,6 +4,7 @@ def main():
     print("SARAN O.K")
     print("yim")
     print("title lover ขุนแพน")
+    print("ตามหาสาวแว่นมาเป็นแฟน")
 
 if __name__ == "__main__":
     main()
