@@ -18,8 +18,7 @@
 | `first_name`     | `str`   | ชื่อจริง                                           |
 | `last_name`      | `str`   | นามสกุล                                            |
 | `account_number` | `str`   | เลขบัญชี (xxx-x-xxxxx-x)                           |
-| `pin`            | `str`   | รหัส PIN                                           |
-| `balance`        | `float` | ยอดเงิน                                            |
+| `pin`            | `str`   | รหัส PIN                                           | |
 | `created_at`     | `str`   | เวลา (เช่น ISO8601: `"2025-10-07T21:35:00+07:00"`) |
 
 ### Returns
