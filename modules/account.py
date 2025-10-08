@@ -1,4 +1,3 @@
 # modules/account.py
 # พวกระบบบัญชี (ยังไม่ทำจริง แค่โครง)
-print("หี ควย แตด หน้าหี")
 #asdwqweqewqwe
