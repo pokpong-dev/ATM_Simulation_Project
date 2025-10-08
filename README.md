@@ -72,6 +72,6 @@
 - [2] Deposit
 - [3] Withdraw
 - [4] Transfer
-- [5] Statement
+- [5] Transactions history
 - [6] Logout
 ---
