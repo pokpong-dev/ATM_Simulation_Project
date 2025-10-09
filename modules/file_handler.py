@@ -32,7 +32,7 @@ else:
 
 #TEMPLATE#
 
-_account_template = "title,first_name,last_name,account_number,pin,balance,created_at"
+_account_template = "title,first_name,last_name,account_number,pin,created_at"
 _transaction_template = "transaction_id,timestamp,type,amount,balance,target"
 
 _list_account_template = [_account_template]
@@ -69,9 +69,9 @@ def _write_header(file_location, template):
     """
     try:
         with open(file_location, "w") as f:
-            if template == "_account_template":
+            if template == _account_template:
                 f.write(_account_template + "\n")
-            elif template == "_transaction_template":
+            elif template == _transaction_template:
                 f.write(_transaction_template + "\n")
             else:
                 raise FileNotFoundError(f"{template} ที่นายส่งมามันไม่ถูกเพื่อนมันมีแค่ account_template กับ transaction_template")
@@ -80,7 +80,7 @@ def _write_header(file_location, template):
 
 
 ### PUBLIC FUNCTIONS ###
-def append_account_file(title, first_name, last_name, account_number, pin, balance, created_at):
+def append_account_file(title, first_name, last_name, account_number, pin, created_at):
     """
     เพิ่มข้อมูล account ถ้าไม่มีสร้างใหม่อัตโนมัติ ถ้ามีก็เขียนต่อบรรทัดสุดท้ายของไฟล์นั้นๆ
     :param title: str
@@ -88,7 +88,6 @@ def append_account_file(title, first_name, last_name, account_number, pin, balan
     :param last_name: str
     :param account_number: str
     :param pin: str
-    :param balance: float
     :param created_at: str
     :return: None
     """
@@ -98,7 +97,6 @@ def append_account_file(title, first_name, last_name, account_number, pin, balan
         "last_name": str,
         "account_number": str,
         "pin": str,
-        "balance": float,
         "created_at": str
     }
 
@@ -108,7 +106,7 @@ def append_account_file(title, first_name, last_name, account_number, pin, balan
             raise TypeError(f"{my_friend_parameter} ต้องเป็น {validate_account_paramete.__name__} นะเพื่อน ไม่ใช่ {type(value).__name__}")
 
 
-    get_args_account = [title, first_name, last_name, account_number, pin, balance, created_at]
+    get_args_account = [title, first_name, last_name, account_number, pin, created_at]
     if not _is_header(accounts_file, _account_template):
         _write_header(accounts_file, _account_template)
     convert_list_to_string = ",".join(str(x) for x in get_args_account)
