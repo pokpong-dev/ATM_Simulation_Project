@@ -2,7 +2,9 @@
 
 import datetime
 import random
-import file_handler
+
+from modules import atm_file_handler
+
 
 #randomตัวเลขธุรกรรม
 def transaction_id_generator():
@@ -13,7 +15,7 @@ def transaction_id_generator():
 def add_transaction_deposit(account_number,amount):
     plus_num = 0
     try:
-        dep = file_handler.read_transaction_file(account_number)
+        dep = atm_file_handler.read_transaction_file(account_number)
         lol = len(dep)
         for i in range(lol):
             acc_num = dep[i].split(",")[3]
@@ -26,7 +28,7 @@ def add_transaction_deposit(account_number,amount):
                 decimal1 = float(cut1)
                 plus_num += decimal1
         timestamps = datetime.datetime.now().isoformat()
-        file_handler.append_transaction_log_file(
+        atm_file_handler.append_transaction_log_file(
             account_number=account_number,
             transaction_id=transaction_id_generator(),
             timestamp=timestamps[0:19],
@@ -42,7 +44,7 @@ def add_transaction_deposit(account_number,amount):
 def add_transaction_firstdeposit(account_number,amount):
     checkfile = False
     check = False
-    num_acc = file_handler.read_accounts_file()
+    num_acc = atm_file_handler.read_accounts_file()
     for i in range(len(num_acc)):
         acc_num = num_acc[i].split(",")[3]
         if acc_num == account_number :
@@ -51,12 +53,12 @@ def add_transaction_firstdeposit(account_number,amount):
             break
 
     try:
-        file_handler.read_transaction_file(account_number)
+        atm_file_handler.read_transaction_file(account_number)
     except:
         checkfile = True
     if check == True and checkfile == True:
         timestamps = datetime.datetime.now().isoformat()
-        file_handler.append_transaction_log_file(
+        atm_file_handler.append_transaction_log_file(
             account_number=account_number,
             transaction_id=transaction_id_generator(),
             timestamp=timestamps[0:19],
@@ -72,7 +74,7 @@ def add_transaction_firstdeposit(account_number,amount):
 def add_transaction_withdrawal(account_number,amount):
     plus_num = 0
     try:
-        dep = file_handler.read_transaction_file(account_number)
+        dep = atm_file_handler.read_transaction_file(account_number)
         lol = len(dep)
         for i in range(lol):
             new_balance = dep[i].split(",")[4]
@@ -84,7 +86,7 @@ def add_transaction_withdrawal(account_number,amount):
         timestamps = datetime.datetime.now().isoformat()
         if amount > plus_num:
             return {"status":"error","msg":"เงินไม่พอ"}
-        file_handler.append_transaction_log_file(
+        atm_file_handler.append_transaction_log_file(
             account_number=account_number,
             transaction_id=transaction_id_generator(),
             timestamp=timestamps[0:19],
@@ -100,7 +102,7 @@ def add_transaction_withdrawal(account_number,amount):
 #เซ็กยอดเงิน
 def check_balance(account_number):
     try:
-        dep = file_handler.read_transaction_file(account_number)
+        dep = atm_file_handler.read_transaction_file(account_number)
         lol = len(dep)
         for i in range(lol):
             acc_num = dep[i].split(",")[4]
@@ -113,7 +115,7 @@ def check_balance(account_number):
 def add_transaction_transfer(account_number,account_numberv2,amount):
     plus_num = 0
     try:
-        dep = file_handler.read_transaction_file(account_number)
+        dep = atm_file_handler.read_transaction_file(account_number)
         lol = len(dep)
         for i in range(lol):
             new_balance = dep[i].split(",")[4]
@@ -125,7 +127,7 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
         timestamps = datetime.datetime.now().isoformat()
         if amount > plus_num:
             return {"status":"error","msg":"เงินไม่พอ"}
-        file_handler.append_transaction_log_file(
+        atm_file_handler.append_transaction_log_file(
             account_number=account_number,
             transaction_id=transaction_id_generator(),
             timestamp=timestamps[0:19],
@@ -135,7 +137,7 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
             target=account_numberv2
         )
         add_transaction_firstdeposit(account_numberv2,amount)
-        if len(file_handler.read_transaction_file(account_numberv2))>= 2:
+        if len(atm_file_handler.read_transaction_file(account_numberv2))>= 2:
             add_transaction_deposit(account_numberv2, amount)
     except FileNotFoundError:
         return {"status":"error","msg":"มันไม่มีบัญชี"}
@@ -143,7 +145,7 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
 
 def check_transaction_history(account_number):
     try:
-        history = file_handler.read_transaction_file(account_number)
+        history = atm_file_handler.read_transaction_file(account_number)
         return {"status":"success","msg":history}
     except FileNotFoundError:
         return {"status":"error","msg":"มันไม่มีบัญชี"}
@@ -157,7 +159,7 @@ def check_transaction_history(account_number):
 #m = add_transaction_withdrawal("123-4-56789-0",500.00)
 #print(m)
 #print(x)
-# file_handler.append_account_file(
+# atm_file_handler.append_account_file(
 #     "MR", "Pokpong", "Numberone",
 #     "123-4-56789-0", "655576",
 #     "2025-10-07T21:35:00+07:00"
