@@ -6,7 +6,7 @@ def register(title, first_name, last_name, account_number, pin, created_at):
     #title ถ้าไม่ได้รับ MR หรือ ms
     if title != "MR" and title != "MS":
         return {"status": "failed", "msg": "Select title MR or MS"}
-
+#
     #เช็คเลขบัญชีว่าเคยสั่งสมัครยัง ในไฟ
     log_login = file_handler.read_accounts_file()
     for i in range(len(log_login)):
