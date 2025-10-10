@@ -1,7 +1,7 @@
 import file_handler
 import random
 from datetime import datetime
-#eiei
+
 def register(title, first_name, last_name, account_number, pin, created_at):
     #title ถ้าไม่ได้รับ MR หรือ ms
     if title != "MR" and title != "MS":
