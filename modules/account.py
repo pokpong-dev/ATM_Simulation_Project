@@ -1,44 +1,12 @@
 # modules/account.py
 # พวกระบบบัญชี (ยังไม่ทำจริง แค่โครง)
 #asdwqweqewqwe
-# import file_handler
-# file_handler.append_account_file(
-#     "MR", "Pokpong", "Numberone",
-#     "123-4-56789-0", "655576",
-#     "2025-10-07T21:35:00+07:00"
-# )
 
-# modules/account.py
-# พวกระบบบัญชี (ยังไม่ทำจริง แค่โครง)
-#asdwqweqewqwe
 from logging import exception
-
-import file_handler
-# modules/account.py
-# พวกระบบบัญชี (ยังไม่ทำจริง แค่โครง)
-#asdwqweqewqwe
-
 import datetime
 import random
 import file_handler
 from modules.file_handler import read_transaction_file
-
-
-# file_handler.append_transaction_log_file(
-#     account_number="123-4-56789-0",
-#     transaction_id="TXN0001",
-#     #timestamp="2025-10-07T21:35:00+07:00",
-#     type_i="deposit",
-#     amount=15000.1,
-#     balance=655576.1,
-#     target=""
-# )
-
-# file_handler.append_account_file(
-#     "MR", "Pokpong", "Numberone",
-#     "123-4-56789-0", "655576",
-#     "2025-10-07T21:35:00+07:00"
-# )
 
 #randomตัวเลขธุรกรรม
 def transaction_id_generator():
@@ -168,7 +136,8 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
     if len(file_handler.read_transaction_file(account_numberv2))>= 2:
         add_transaction_deposit(account_numberv2, abs(amount))
 
-
+#ถอนเงินที่ตู้
+b1000
 
 
 # x = add_transaction_firstdeposit(account_number="123-4-56789-1",amount=20000.0)
