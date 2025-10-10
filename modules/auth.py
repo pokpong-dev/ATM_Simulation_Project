@@ -1,8 +1,8 @@
-import file_handler
+from modules import atm_file_handler
 import random
 from datetime import datetime
 
-def register(title, first_name, last_name, account_number, pin, created_at):
+def register(title, first_name, last_name, account_number, pin):
     #title ถ้าไม่ได้รับ MR หรือ ms
     if title != "MR" and title != "MS":
         return {"status": "error", "msg": "Select title MR or MS"}
@@ -17,7 +17,7 @@ def register(title, first_name, last_name, account_number, pin, created_at):
             return {"status": "error", "msg": "นามสกุล ใส่ตัวอักษรพิเศษไม่ได้ กรอกเป็นตัวอักษรภาษาอังกฤษเท่านั้น"}
 
     #เช็คเลขบัญชีว่าเคยสั่งสมัครยัง ในไฟ
-    log_login = file_handler.read_accounts_file()
+    log_login = atm_file_handler.read_accounts_file()
     for i in range(len(log_login)):
         num_accs = log_login[i].split(",")[3]
         if account_number == num_accs:
@@ -51,7 +51,7 @@ def register(title, first_name, last_name, account_number, pin, created_at):
     created_at = timestamps[0:19]
 
     #เพิ่มข้อมูลเข้าไฟ
-    file_handler.append_account_file(title, first_name, last_name, account_number, pin, created_at)
+    atm_file_handler.append_account_file(title, first_name, last_name, account_number, pin, created_at)
 
     return {"status": "success", "msg": "สมัครบัญชี สำเร็จ"}
 
@@ -60,7 +60,7 @@ def login(account_number, pin):
     if len(pin) != 6:
         return {"status": "error", "msg": "กรอก PIN 6 ตัว เท่านั้น"}
     #อ่านข้อมูลจากไฟล์ที่ reg มันเพิ่มเข้า
-    log_login = file_handler.read_accounts_file()
+    log_login = atm_file_handler.read_accounts_file()
 
     #เวลา
     
