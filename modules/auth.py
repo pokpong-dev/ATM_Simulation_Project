@@ -1,6 +1,5 @@
 import file_handler
 import random
-import time
 from datetime import datetime
 
 
@@ -16,7 +15,7 @@ def register(title, first_name, last_name, account_number, pin, created_at):
         if account_number == num_accs:
             return {"status": "failed", "msg": "This account number already exists"}
 
-    #เช็ค fname กับ Lname ว่าตัวแรกเป็นตัวใหฐ่ไหม
+    #เช็ค fname กับ Lname ว่าตัวแรกเป็นตัวใหฐ่ไหม กับเชคว่าเปนตัวเลขป่าว
     if first_name.isdigit() or not first_name[0].isupper():
         return {"status": "failed", "msg": "First name must start with a capital letter and contain only letters"}
     if last_name.isdigit() or not last_name[0].isupper():
