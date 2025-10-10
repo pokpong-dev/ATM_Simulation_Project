@@ -1,9 +1,16 @@
 from modules import atm_file_handler
 import random
-from datetime import datetime
+import datetime
 
-def register(title, first_name, last_name, account_number, pin):
+def register(title, first_name, last_name, pin):
     #title ถ้าไม่ได้รับ MR หรือ ms
+    # สุ่มเลขบัญชี
+    acc_nums1 = random.randint(0, 999)
+    acc_nums2 = random.randint(0, 9)
+    acc_nums3 = random.randint(0, 99999)
+    acc_nums4 = random.randint(0, 9)
+    account_number = f"{acc_nums1:03}-{acc_nums2}-{acc_nums3:05}-{acc_nums4}"
+    lol=["MR", "MS"]
     if title != "MR" and title != "MS":
         return {"status": "error", "msg": "Select title MR or MS"}
 
@@ -39,16 +46,11 @@ def register(title, first_name, last_name, account_number, pin):
     if not pin.isdigit():
         return {"status": "error", "msg": "กรอกเป็นตัวเลขเท่านั้น"}
 
-    #สุ่มเลขบัญชี
-    acc_nums1 = random.randint(0, 999)
-    acc_nums2 = random.randint(0, 9)
-    acc_nums3 = random.randint(0, 99999)
-    acc_nums4 = random.randint(0, 9)
-    account_number = f"{acc_nums1:03}-{acc_nums2}-{acc_nums3:05}-{acc_nums4}"
+
 
     #เวลา
-    timestamps = datetime.datetime.now().isoformat()
-    created_at = timestamps[0:19]
+    #timestamps = datetime.datetime.now()
+    created_at = str(datetime.datetime.now())
 
     #เพิ่มข้อมูลเข้าไฟ
     atm_file_handler.append_account_file(title, first_name, last_name, account_number, pin, created_at)
