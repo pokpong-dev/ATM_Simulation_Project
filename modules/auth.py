@@ -1,7 +1,9 @@
+# modules/auth.py
+# พวกระบบล็อคอิน/เปิดบัญชี (ยังไม่ทำจริง แค่โครง)
 import file_handler
 import random
 from datetime import datetime
-#
+
 def register(title, first_name, last_name, account_number, pin, created_at):
     #title ถ้าไม่ได้รับ MR หรือ ms
     if title != "MR" and title != "MS":
@@ -73,7 +75,7 @@ def login(account_number, pin,created_at):
 
 
 #ทดสอบ สมัคร เฉยๆ
-test_registration = register("MR", "John", "Doe", "xxx-x-xxxxx-x", "122456", "s")
+test_registration = register("MR", "Kiw", "Wy", "xxx-x-xxxxx-x", "122456", "s")
 print(test_registration)
 
 #ทดสอบการล้อคอิน
