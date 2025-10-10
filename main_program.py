@@ -74,19 +74,29 @@ def main_menu(account_number):
             #if balance is None:
             print(balance)
         elif choice == "2":
-            print(type(account_number))
-            print(account_number)
+            check_amount = True
             amount = float(input("Enter deposit amount (100, 500, 1000 banknote only): "))
-            print(amount)
-            result = account.add_transaction_firstdeposit(account_number, amount)
-            result = account.add_transaction_deposit(account_number, amount)
-            receipt(account_number, "Deposit", amount)
-            print(result["msg"])
+            if amount % 100 != 0:
+                print("100, 500, 1000 banknote only")
+                check_amount = False
+            if check_amount:
+                balance = account.check_balance(account_number)
+                print(balance)
+                print(amount)
+                result = account.add_transaction_firstdeposit(account_number, amount)
+                result = account.add_transaction_deposit(account_number, amount)
+                receipt(account_number, "Deposit", amount)
+                print(result["msg"])
         elif choice == "3":
+            check_amount = True
             amount = float(input("Enter withdraw amount: "))
-            result = account.add_transaction_withdrawal(account_number, amount)
-            receipt(account_number, "Withdrawal", amount)
-            print(result["msg"])
+            if amount % 100 != 0:
+                print("100, 500, 1000 banknote only")
+                check_amount = False
+            if check_amount:
+                result = account.add_transaction_withdrawal(account_number, amount)
+                receipt(account_number, "Withdrawal", amount)
+                print(result["msg"])
         elif choice == "4":
             account_numberv2 = input("Enter recipient account number: ").strip()
             amount = float(input("Enter transfer amount: "))
