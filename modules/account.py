@@ -36,9 +36,9 @@ def add_transaction_deposit(account_number,amount):
             amount=amount,
             balance= amount+plus_num,
             target="")
-        return {"status":"success","msg":"สำเร็จ"}
+        return {"status":"success","msg":f"ฝากเงิน {amount} บาท สำเร็จ"}
     except FileNotFoundError:
-        return {"status":"error","msg":"มันไม่มีบัญชีหรืออาจจะทำรายการซ้ำ"}
+        return {"status":"error","msg":"ไม่พบบัญชีหรืออาจจะทำรายการซ้ำ"}
 
 #เซ็คเลขบัญชีว่ามีอยู่จริงมั้ย
 def add_transaction_firstdeposit(account_number,amount):
@@ -66,9 +66,9 @@ def add_transaction_firstdeposit(account_number,amount):
             amount=amount,
             balance=amount,
             target="")
-        return {"status":"success","msg":"สำเร็จ"}
+        return {"status":"success","msg":f"ฝากเงิน {amount} บาท ครั้งแรกสำเร็จ"}
     else:
-        return {"status":"error","msg":"มันไม่มีบัญชี"}
+        return {"status":"error","msg":"ไม่พบบัญชี"}
 
 #ถอนเงิน
 def add_transaction_withdrawal(account_number,amount):
@@ -85,7 +85,7 @@ def add_transaction_withdrawal(account_number,amount):
                 plus_num += decimal1
         timestamps = datetime.datetime.now().isoformat()
         if amount > plus_num:
-            return {"status":"error","msg":"เงินไม่พอ"}
+            return {"status":"error","msg":"ยอดเงินไม่เพียง่พอ"}
         atm_file_handler.append_transaction_log_file(
             account_number=account_number,
             transaction_id=transaction_id_generator(),
@@ -94,9 +94,9 @@ def add_transaction_withdrawal(account_number,amount):
             amount=-abs(amount),
             balance= plus_num-amount,
             target="")
-        return {"status":"success","msg":"สำเร็จ"}
+        return {"status":"success","msg":f"ถอนเงิน {amount} สำเร็จ"}
     except FileNotFoundError:
-            return {"status":"error","msg":"มันไม่มีบัญชี"}
+            return {"status":"error","msg":"ไม่พบบัญชี"}
             
 
 #เซ็กยอดเงิน
@@ -109,7 +109,7 @@ def check_balance(account_number):
             if i == lol - 1:
                 return {"status":"success","msg":acc_num}
     except FileNotFoundError:
-        return {"status":"error","msg":"มันไม่มีบัญชี"}
+        return {"status":"error","msg":"ไม่พบบัญชี"}
 
 #โอนเงิน
 def add_transaction_transfer(account_number,account_numberv2,amount):
@@ -126,7 +126,7 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
                 plus_num += decimal1
         timestamps = datetime.datetime.now().isoformat()
         if amount > plus_num:
-            return {"status":"error","msg":"เงินไม่พอ"}
+            return {"status":"error","msg":"ยอดเงินไม่เพียงพอ"}
         atm_file_handler.append_transaction_log_file(
             account_number=account_number,
             transaction_id=transaction_id_generator(),
@@ -140,15 +140,14 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
         if len(atm_file_handler.read_transaction_file(account_numberv2))>= 2:
             add_transaction_deposit(account_numberv2, amount)
     except FileNotFoundError:
-        return {"status":"error","msg":"มันไม่มีบัญชี"}
+        return {"status":"error","msg":"ไม่พบบัญชี"}
         
 
 def check_transaction_history(account_number):
-    try:
-        history = atm_file_handler.read_transaction_file(account_number)
-        return {"status":"success","msg":history}
-    except FileNotFoundError:
-        return {"status":"error","msg":"มันไม่มีบัญชี"}
+    history = atm_file_handler.read_transaction_file(account_number)
+    if not history:
+        return {"status":"error","msg":"ไม่พบบัญชี"}
+    return {"status": "success", "msg": history}
 #ถอนเงินที่ตู้
 
 
