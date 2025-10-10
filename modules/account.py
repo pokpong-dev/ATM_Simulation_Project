@@ -14,6 +14,7 @@ def transaction_id_generator():
 #ฝากเงิน
 def add_transaction_deposit(account_number,amount):
     plus_num = 0
+    gen_transaction_id = transaction_id_generator()
     try:
         dep = atm_file_handler.read_transaction_file(account_number)
         lol = len(dep)
@@ -22,7 +23,6 @@ def add_transaction_deposit(account_number,amount):
             new_balance = dep[i].split(",")[4]
             deletepoint = acc_num.find(".")
             deletepoint1 = new_balance.find(".")
-            cut = acc_num[:deletepoint]
             cut1 = new_balance[:deletepoint1]
             if i == lol - 1:
                 decimal1 = float(cut1)
@@ -30,18 +30,19 @@ def add_transaction_deposit(account_number,amount):
         timestamps = datetime.datetime.now().isoformat()
         atm_file_handler.append_transaction_log_file(
             account_number=account_number,
-            transaction_id=transaction_id_generator(),
+            transaction_id=gen_transaction_id,
             timestamp=timestamps[0:19],
             type_i="deposit",
             amount=amount,
             balance= amount+plus_num,
             target="")
-        return {"status":"success","msg":f"ฝากเงิน {amount} บาท สำเร็จ"}
+        return {"status":"success","msg":f"ฝากเงิน {amount} บาท สำเร็จ, {gen_transaction_id}"}
     except FileNotFoundError:
         return {"status":"error","msg":"ไม่พบบัญชีหรืออาจจะทำรายการซ้ำ"}
 
 #เซ็คเลขบัญชีว่ามีอยู่จริงมั้ย
 def add_transaction_firstdeposit(account_number,amount):
+    gen_transaction_id = transaction_id_generator()
     checkfile = False
     check = False
     num_acc = atm_file_handler.read_accounts_file()
@@ -60,18 +61,19 @@ def add_transaction_firstdeposit(account_number,amount):
         timestamps = datetime.datetime.now().isoformat()
         atm_file_handler.append_transaction_log_file(
             account_number=account_number,
-            transaction_id=transaction_id_generator(),
+            transaction_id=gen_transaction_id,
             timestamp=timestamps[0:19],
             type_i="deposit",
             amount=amount,
             balance=amount,
             target="")
-        return {"status":"success","msg":f"ฝากเงิน {amount} บาท ครั้งแรกสำเร็จ"}
+        return {"status":"success","msg":f"ฝากเงิน {amount} บาท ครั้งแรกสำเร็จ , {gen_transaction_id} "}
     else:
         return {"status":"error","msg":"ไม่พบบัญชี"}
 
 #ถอนเงิน
 def add_transaction_withdrawal(account_number,amount):
+    gen_transaction_id = transaction_id_generator()
     plus_num = 0
     try:
         dep = atm_file_handler.read_transaction_file(account_number)
@@ -88,13 +90,13 @@ def add_transaction_withdrawal(account_number,amount):
             return {"status":"error","msg":"ยอดเงินไม่เพียง่พอ"}
         atm_file_handler.append_transaction_log_file(
             account_number=account_number,
-            transaction_id=transaction_id_generator(),
+            transaction_id=gen_transaction_id,
             timestamp=timestamps[0:19],
             type_i="withdrawal",
             amount=-abs(amount),
             balance= plus_num-amount,
             target="")
-        return {"status":"success","msg":f"ถอนเงิน {amount} สำเร็จ"}
+        return {"status":"success","msg":f"ถอนเงิน {amount} สำเร็จ , {gen_transaction_id} "}
     except FileNotFoundError:
             return {"status":"error","msg":"ไม่พบบัญชี"}
             
@@ -114,6 +116,7 @@ def check_balance(account_number):
 #โอนเงิน
 def add_transaction_transfer(account_number,account_numberv2,amount):
     plus_num = 0
+    gen_transaction_id = transaction_id_generator()
     try:
         dep = atm_file_handler.read_transaction_file(account_number)
         lol = len(dep)
@@ -129,7 +132,7 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
             return {"status":"error","msg":"ยอดเงินไม่เพียงพอ"}
         atm_file_handler.append_transaction_log_file(
             account_number=account_number,
-            transaction_id=transaction_id_generator(),
+            transaction_id=gen_transaction_id,
             timestamp=timestamps[0:19],
             type_i="transfer",
             amount=-abs(amount),
