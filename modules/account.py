@@ -137,7 +137,7 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
         add_transaction_deposit(account_numberv2, abs(amount))
 
 #ถอนเงินที่ตู้
-b1000
+
 
 
 # x = add_transaction_firstdeposit(account_number="123-4-56789-1",amount=20000.0)
