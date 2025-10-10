@@ -16,30 +16,34 @@ def transaction_id_generator():
 #ฝากเงิน
 def add_transaction_deposit(account_number,amount):
     plus_num = 0
-    dep = file_handler.read_transaction_file(account_number)
-    lol = len(dep)
-    for i in range(lol):
-        acc_num = dep[i].split(",")[3]
-        new_balance = dep[i].split(",")[4]
-        Deletepoint = acc_num.find(".")
-        Deletepoint1 = new_balance.find(".")
-        cut = acc_num[:Deletepoint]
-        cut1 = new_balance[:Deletepoint1]
-        if i == lol - 1:
-            decimal = float(cut)
-            decimal1 = float(cut1)
-            plus_num += decimal1
-            print(plus_num)
-            print(cut,cut1)
-    timestamps = datetime.datetime.now().isoformat()
-    file_handler.append_transaction_log_file(
-        account_number=account_number,
-        transaction_id=transaction_id_generator(),
-        timestamp=timestamps[0:19],
-        type_i="deposit",
-        amount=amount,
-        balance= amount+plus_num,
-        target="")
+    try:
+        dep = file_handler.read_transaction_file(account_number)
+        lol = len(dep)
+        for i in range(lol):
+            acc_num = dep[i].split(",")[3]
+            new_balance = dep[i].split(",")[4]
+            Deletepoint = acc_num.find(".")
+            Deletepoint1 = new_balance.find(".")
+            cut = acc_num[:Deletepoint]
+            cut1 = new_balance[:Deletepoint1]
+            if i == lol - 1:
+                decimal = float(cut)
+                decimal1 = float(cut1)
+                plus_num += decimal1
+                print(plus_num)
+                print(cut,cut1)
+        timestamps = datetime.datetime.now().isoformat()
+        file_handler.append_transaction_log_file(
+            account_number=account_number,
+            transaction_id=transaction_id_generator(),
+            timestamp=timestamps[0:19],
+            type_i="deposit",
+            amount=amount,
+            balance= amount+plus_num,
+            target="")
+        return {"status":"success","msg":"สำเร็จ"}
+    except FileNotFoundError:
+        return {"status":"error","msg":"มันไม่มีบัญชี"}
 
 #เซ็คเลขบัญชีว่ามีอยู่จริงมั้ย
 def add_transaction_firstdeposit(account_number,amount):
@@ -67,74 +71,86 @@ def add_transaction_firstdeposit(account_number,amount):
             amount=amount,
             balance=amount,
             target="")
-        return {"status":"success","msg":"มันไม่มีบัญชี"}
+        return {"status":"success","msg":"สำเร็จ"}
     else:
         return {"status":"error","msg":"มันไม่มีบัญชี"}
 
 #ถอนเงิน
 def add_transaction_withdrawal(account_number,amount):
     plus_num = 0
-    dep = file_handler.read_transaction_file(account_number)
-    lol = len(dep)
-    for i in range(lol):
-        acc_num = dep[i].split(",")[3]
-        new_balance = dep[i].split(",")[4]
-        Deletepoint = acc_num.find(".")
-        Deletepoint1 = new_balance.find(".")
-        cut = acc_num[:Deletepoint]
-        cut1 = new_balance[:Deletepoint1]
-        if i == lol - 1:
-            decimal = float(cut)
-            decimal1 = float(cut1)
-            plus_num -= decimal1
-    timestamps = datetime.datetime.now().isoformat()
-    file_handler.append_transaction_log_file(
-        account_number=account_number,
-        transaction_id=transaction_id_generator(),
-        timestamp=timestamps[0:19],
-        type_i="withdrawal",
-        amount=amount,
-        balance= amount-plus_num,
-        target="")
+    try:
+        dep = file_handler.read_transaction_file(account_number)
+        lol = len(dep)
+        for i in range(lol):
+            acc_num = dep[i].split(",")[3]
+            new_balance = dep[i].split(",")[4]
+            Deletepoint = acc_num.find(".")
+            Deletepoint1 = new_balance.find(".")
+            cut = acc_num[:Deletepoint]
+            cut1 = new_balance[:Deletepoint1]
+            if i == lol - 1:
+                decimal = float(cut)
+                decimal1 = float(cut1)
+                plus_num -= decimal1
+        timestamps = datetime.datetime.now().isoformat()
+        file_handler.append_transaction_log_file(
+            account_number=account_number,
+            transaction_id=transaction_id_generator(),
+            timestamp=timestamps[0:19],
+            type_i="withdrawal",
+            amount=amount,
+            balance= amount-plus_num,
+            target="")
+        return {"status":"success","msg":"สำเร็จ"}
+        except FileNotFoundError:
+            return {"status":"error","msg":"มันไม่มีบัญชี"}
+            
 
 #เซ็กยอดเงิน
 def check_balance(account_number):
-    dep = file_handler.read_transaction_file(account_number)
-    lol = len(dep)
-    for i in range(lol):
-        acc_num = dep[i].split(",")[4]
-        if i == lol - 1:
-            return acc_num
+    try:
+        dep = file_handler.read_transaction_file(account_number)
+        lol = len(dep)
+        for i in range(lol):
+            acc_num = dep[i].split(",")[4]
+            if i == lol - 1:
+                return {"status":"success","msg":acc_num}
+    except FileNotFoundError:
+        return {"status":"error","msg":"มันไม่มีบัญชี"}
 
 #โอนเงิน
 def add_transaction_transfer(account_number,account_numberv2,amount):
     plus_num = 0
-    dep = file_handler.read_transaction_file(account_number)
-    lol = len(dep)
-    for i in range(lol):
-        acc_num = dep[i].split(",")[3]
-        new_balance = dep[i].split(",")[4]
-        Deletepoint = acc_num.find(".")
-        Deletepoint1 = new_balance.find(".")
-        cut = acc_num[:Deletepoint]
-        cut1 = new_balance[:Deletepoint1]
-        if i == lol - 1:
-            decimal = float(cut)
-            decimal1 = float(cut1)
-            plus_num -= decimal1
-    timestamps = datetime.datetime.now().isoformat()
-    file_handler.append_transaction_log_file(
-        account_number=account_number,
-        transaction_id=transaction_id_generator(),
-        timestamp=timestamps[0:19],
-        type_i="transfer",
-        amount=amount,
-        balance= amount-plus_num,
-        target=account_numberv2
-    )
-    add_transaction_firstdeposit(account_numberv2,abs(amount))
-    if len(file_handler.read_transaction_file(account_numberv2))>= 2:
-        add_transaction_deposit(account_numberv2, abs(amount))
+    try:
+        dep = file_handler.read_transaction_file(account_number)
+        lol = len(dep)
+        for i in range(lol):
+            acc_num = dep[i].split(",")[3]
+            new_balance = dep[i].split(",")[4]
+            Deletepoint = acc_num.find(".")
+            Deletepoint1 = new_balance.find(".")
+            cut = acc_num[:Deletepoint]
+            cut1 = new_balance[:Deletepoint1]
+            if i == lol - 1:
+                decimal = float(cut)
+                decimal1 = float(cut1)
+                plus_num -= decimal1
+        timestamps = datetime.datetime.now().isoformat()
+        file_handler.append_transaction_log_file(
+            account_number=account_number,
+            transaction_id=transaction_id_generator(),
+            timestamp=timestamps[0:19],
+            type_i="transfer",
+            amount=amount,
+            balance= amount-plus_num,
+            target=account_numberv2
+        )
+        add_transaction_firstdeposit(account_numberv2,abs(amount))
+        if len(file_handler.read_transaction_file(account_numberv2))>= 2:
+            add_transaction_deposit(account_numberv2, abs(amount))
+    except FileNotFoundError:
+        return {"status":"error","msg":"มันไม่มีบัญชี"}
+        
 
 #ถอนเงินที่ตู้
 
@@ -144,8 +160,7 @@ def add_transaction_transfer(account_number,account_numberv2,amount):
 #y = add_transaction_deposit("123-4-56789-0",3000.00)
 #m = add_transaction_withdrawal("123-4-56789-0",-3000.00)
 #c = check_balance("123-4-56789-0")
-o = add_transaction_transfer("123-4-56789-0","123-4-56789-1",-1000.00)
-print(o)
+
 
 
 
